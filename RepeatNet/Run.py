@@ -62,6 +62,10 @@ def infer(args):
         print('epoch', i)
         file = base_output_path+'model/'+ str(i) + '.pkl'
 
+        result_output_path = os.path.join(base_output_path, 'result/')
+        if not os.path.exists(result_output_path):
+            os.makedirs(result_output_path)
+
         if os.path.exists(file):
             model = RepeatNet(embedding_size, hidden_size, item_vocab_size)
             model.load_state_dict(torch.load(file, map_location='cpu'))
