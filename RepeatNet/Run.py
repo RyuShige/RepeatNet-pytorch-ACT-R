@@ -9,6 +9,7 @@ from RepeatNet.Model import *
 import codecs
 import numpy as np
 import random
+import os
 
 def get_ms():
     return time.time() * 1000
@@ -23,9 +24,9 @@ def init_seed(seed=None):
     torch.cuda.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
 
-base_output_path = '../output/RepeatNet/'
-base_data_path = '../datasets/demo/'
-dir_path = os.path.dirname(os.path.realpath(__file__))
+base_output_path = './output/RepeatNet/' # colab上で実行する場合、カレントディレクトリに戻ってしまうので../ではなく./
+base_data_path = './datasets/demo/'
+dir_path = os.path.dirname(os.path.realpath(__file__)) # ファイルが存在するディレクトリのパスを取得
 epoches=100
 embedding_size=128
 hidden_size=128
@@ -34,6 +35,9 @@ item_vocab_size=10+1
 
 def train(args):
     batch_size = 1024
+
+    path = os.getcwd()
+    print(path)
 
     train_dataset = RepeatNetDataset(base_data_path+'demo.train')
     train_size=train_dataset.len
@@ -58,7 +62,7 @@ def infer(args):
         print('epoch', i)
         file = base_output_path+'model/'+ str(i) + '.pkl'
 
-        if not os.path.exists(file):
+        if os.path.exists(file):
             model = RepeatNet(embedding_size, hidden_size, item_vocab_size)
             model.load_state_dict(torch.load(file, map_location='cpu'))
             trainer = CumulativeTrainer(model, None, None, args.local_rank, 4)

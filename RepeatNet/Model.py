@@ -14,7 +14,7 @@ def gru_forward(gru, input, lengths, state=None, batch_first=True):
     total_length=input.size(1)
     if not batch_first:
         input = input.transpose(0, 1)  # B x L x N -> L x B x N
-    packed = torch.nn.utils.rnn.pack_padded_sequence(input, input_lengths, batch_first)
+    packed = torch.nn.utils.rnn.pack_padded_sequence(input, input_lengths.cpu(), batch_first) # .cpu()でtorch.Tensorのデバイスをcpuに切り替え
 
     outputs, state = gru(packed, state)
     outputs, output_lengths = torch.nn.utils.rnn.pad_packed_sequence(outputs, batch_first=batch_first, total_length=total_length)  # unpack (back to padded)
