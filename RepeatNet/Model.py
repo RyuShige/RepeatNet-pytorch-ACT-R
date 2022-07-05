@@ -79,6 +79,9 @@ class RepeatNet(nn.Module):
         _, p_repeat = self.repeat_attn.score(state.reshape(batch_size, -1).unsqueeze(1), output, mask=mask.unsqueeze(1))
         p_repeat=torch.bmm(p_repeat, data['source_map']).squeeze(1)
 
+        print(p_repeat)
+        print(p_repeat.size())
+
         mode_feature, attn, norm_attn = self.mode_attn(state.reshape(batch_size, -1).unsqueeze(1), output, output, mask=mask.unsqueeze(1))
         p_mode=F.softmax(self.mode(mode_feature.squeeze(1)), dim=-1)
 
