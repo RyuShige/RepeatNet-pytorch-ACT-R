@@ -76,18 +76,14 @@ class RepeatNet(nn.Module):
         p_explore = p_explore.masked_fill(explore_mask.bool(), float('-inf')) # not sure we need to mask this out, depends on experiment results
         p_explore = F.softmax(p_explore, dim=-1)
 
-        _, p_repeat = self.repeat_attn.score(state.reshape(batch_size, -1).unsqueeze(1), output, mask=mask.unsqueeze(1))
-        p_repeat=torch.bmm(p_repeat, data['source_map']).squeeze(1)
+        # _, p_repeat = self.repeat_attn.score(state.reshape(batch_size, -1).unsqueeze(1), output, mask=mask.unsqueeze(1))
+        # p_repeat=torch.bmm(p_repeat, data['source_map']).squeeze(1)
 
         mode_feature, attn, norm_attn = self.mode_attn(state.reshape(batch_size, -1).unsqueeze(1), output, output, mask=mask.unsqueeze(1))
         p_mode=F.softmax(self.mode(mode_feature.squeeze(1)), dim=-1)
 
-        p = p_mode[:, 0].unsqueeze(-1)*p_explore + p_mode[:, 1].unsqueeze(-1)*p_repeat
-
-        print("p_mode:{}".format(p_mode))
-        print(p_mode.size())
-        print("p:{}".format(p))
-        print(p.size())
+        # p = p_mode[:, 0].unsqueeze(-1)*p_explore + p_mode[:, 1].unsqueeze(-1)*p_repeat
+        p = p_mode[:, 0].unsqueeze(-1)*p_explore + p_mode[:, 1].unsqueeze(-1)*0
 
         return p
 
