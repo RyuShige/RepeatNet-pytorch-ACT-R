@@ -144,6 +144,6 @@ class ActrRecommender(ScoreToRecommenderMixin):
                     # https://timvieira.github.io/blog/post/2014/02/11/exp-normalize-trick/
                     comp_scores = comp_scores - np.max(comp_scores)
                 comp_scores = special.softmax(comp_scores)
-            comp_scores = comp_scores * w_c
+            # comp_scores = comp_scores * w_c
             scores = scores.combine(comp_scores, operator.add, 0)
         return scores
