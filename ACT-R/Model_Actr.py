@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats, special
 import operator
+import torch
 
 class DecayFitterMixin:
     def fit(self, events):
@@ -146,4 +147,5 @@ class ActrRecommender(ScoreToRecommenderMixin):
                 comp_scores = special.softmax(comp_scores)
             # comp_scores = comp_scores * w_c
             scores = scores.combine(comp_scores, operator.add, 0)
+        scores = torch.tensor(scores.values).resize_(1, 2)
         return scores
