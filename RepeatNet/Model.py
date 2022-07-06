@@ -60,6 +60,9 @@ class RepeatNet(nn.Module):
         self.explore_attn = BilinearAttention(hidden_size, hidden_size, hidden_size)
         self.explore = nn.Linear(hidden_size, item_vocab_size)
 
+        self.bll_new = BaseLevelComponent(decay=0.86)
+        self.actr_model = ActrRecommender([self.bll_new], softmax=True)
+
     def model(self, data):
         batch_size=data['item_seq'].size(0)
         mask = data['item_seq'].ne(0)
@@ -80,9 +83,8 @@ class RepeatNet(nn.Module):
         # _, p_repeat = self.repeat_attn.score(state.reshape(batch_size, -1).unsqueeze(1), output, mask=mask.unsqueeze(1))
         # p_repeat=torch.bmm(p_repeat, data['source_map']).squeeze(1)
 
-        bll_new = BaseLevelComponent(decay=2)
-        actr_model = ActrRecommender([bll_new], softmax=True)
-        actr_scores = actr_model.scores()
+        
+        actr_scores = self.actr_model.scores()
 
         mode_feature, attn, norm_attn = self.mode_attn(state.reshape(batch_size, -1).unsqueeze(1), output, output, mask=mask.unsqueeze(1))
         p_mode=F.softmax(self.mode(mode_feature.squeeze(1)), dim=-1)
