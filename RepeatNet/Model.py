@@ -2,6 +2,7 @@ import torch.nn as nn
 from torch.nn.parameter import Parameter
 import torch
 from Common.BilinearAttention import *
+from ACT-R.Model_Actr import *
 
 def gru_forward(gru, input, lengths, state=None, batch_first=True):
     gru.flatten_parameters()
@@ -79,11 +80,15 @@ class RepeatNet(nn.Module):
         # _, p_repeat = self.repeat_attn.score(state.reshape(batch_size, -1).unsqueeze(1), output, mask=mask.unsqueeze(1))
         # p_repeat=torch.bmm(p_repeat, data['source_map']).squeeze(1)
 
+        bll_new = BaseLevelComponent(decay=2)
+        actr_model = ActrRecommender([bll_new], softmax=True)
+        actr_scores = actr_model.scores()
+
         mode_feature, attn, norm_attn = self.mode_attn(state.reshape(batch_size, -1).unsqueeze(1), output, output, mask=mask.unsqueeze(1))
         p_mode=F.softmax(self.mode(mode_feature.squeeze(1)), dim=-1)
 
         # p = p_mode[:, 0].unsqueeze(-1)*p_explore + p_mode[:, 1].unsqueeze(-1)*p_repeat
-        p = p_mode[:, 0].unsqueeze(-1)*p_explore + p_mode[:, 1].unsqueeze(-1)*0
+        p = p_mode[:, 0].unsqueeze(-1)*p_explore + p_mode[:, 1].unsqueeze(-1)*actr_scores
 
         return p
 
