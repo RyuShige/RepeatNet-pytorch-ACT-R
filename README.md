@@ -15,7 +15,10 @@ Please refer to https://github.com/lijingsdu/sessionRec_NARM
 
 Please cite our AAAI'19 and CIKM'17 papers if you are using our codes and/or based on our codes.
 
-https://github.com/PengjieRen/RepeatNet-pytorchに加えて，https://github.com/socialcomplab/recsys21-relistening-actrを参考としています．
+https://github.com/PengjieRen/RepeatNet-pytorch
+に加えて，
+https://github.com/socialcomplab/recsys21-relistening-actr
+を参考としています．
 
 MIT License
 
