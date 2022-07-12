@@ -63,7 +63,7 @@ class RepeatNet(nn.Module):
         self.bll_new = BaseLevelComponent(decay=0.86)
         self.actr_model = ActrRecommender([self.bll_new], softmax=True)
 
-    def model(self, data):
+    def model(self, data, actr=False):
         batch_size=data['item_seq'].size(0)
         mask = data['item_seq'].ne(0)
         lengths = mask.float().sum(dim=-1).long()
@@ -80,8 +80,8 @@ class RepeatNet(nn.Module):
         p_explore = p_explore.masked_fill(explore_mask.bool(), float('-inf')) # not sure we need to mask this out, depends on experiment results
         p_explore = F.softmax(p_explore, dim=-1)
 
-        # _, p_repeat = self.repeat_attn.score(state.reshape(batch_size, -1).unsqueeze(1), output, mask=mask.unsqueeze(1))
-        # p_repeat=torch.bmm(p_repeat, data['source_map']).squeeze(1)
+        _, p_repeat = self.repeat_attn.score(state.reshape(batch_size, -1).unsqueeze(1), output, mask=mask.unsqueeze(1))
+        p_repeat=torch.bmm(p_repeat, data['source_map']).squeeze(1)
 
         
         actr_scores = self.actr_model.scores()
@@ -89,8 +89,10 @@ class RepeatNet(nn.Module):
         mode_feature, attn, norm_attn = self.mode_attn(state.reshape(batch_size, -1).unsqueeze(1), output, output, mask=mask.unsqueeze(1))
         p_mode=F.softmax(self.mode(mode_feature.squeeze(1)), dim=-1)
 
-        # p = p_mode[:, 0].unsqueeze(-1)*p_explore + p_mode[:, 1].unsqueeze(-1)*p_repeat
-        p = p_mode[:, 0].unsqueeze(-1)*p_explore + p_mode[:, 1].unsqueeze(-1)*actr_scores
+        if actr:
+            p = p_mode[:, 0].unsqueeze(-1)*p_explore + p_mode[:, 1].unsqueeze(-1)*actr_scores
+        else:
+            p = p_mode[:, 0].unsqueeze(-1)*p_explore + p_mode[:, 1].unsqueeze(-1)*p_repeat
 
         return p
 
