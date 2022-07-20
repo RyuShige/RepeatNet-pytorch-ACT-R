@@ -88,6 +88,17 @@ def infer(args):
                     file.write('[' + ','.join([str(id) for id in index[j, :50].tolist()]) + ']|[' + ','.join([str(id) for id in label[j].tolist()]) + ']' + os.linesep)
             file.close()
 
+            # 評価指標
+            # tp = 0
+            # for data, output in rs:
+            #     scores, index=output
+            #     label=data['item_tgt']
+            #     for j in range(label.size(0)):
+            #         if label[j] in index[j, :50].tolist():
+            #             tp+=1
+            #     recall = 
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--local_rank", type=int)

@@ -2,7 +2,7 @@ import torch.nn as nn
 from torch.nn.parameter import Parameter
 import torch
 from Common.BilinearAttention import *
-from ACT-R.Model_Actr import *
+from ACTR.Model_Actr import *
 
 def gru_forward(gru, input, lengths, state=None, batch_first=True):
     gru.flatten_parameters()
