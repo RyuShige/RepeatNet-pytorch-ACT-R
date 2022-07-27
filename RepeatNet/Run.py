@@ -70,14 +70,13 @@ def infer(args):
     epoch = 0
 
     for i in range(epoches):
-        print('epoch', i)
         file = base_output_path+'model/'+ str(i) + '.pkl'
-
         if os.path.exists(file):
             exist_file = file
             epoch = i
         else:
             continue
+    print('most big epoch which has most small loss : ', exist_file)
 
     result_output_path = os.path.join(base_output_path, 'result/')
     if not os.path.exists(result_output_path):
