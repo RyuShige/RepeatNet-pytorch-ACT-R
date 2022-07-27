@@ -10,6 +10,7 @@ import codecs
 import numpy as np
 import random
 import os
+from Common.pytorchtools import EarlyStopping
 
 def get_ms():
     return time.time() * 1000
@@ -48,8 +49,14 @@ def train(args):
     trainer = CumulativeTrainer(model, None, None, args.local_rank, 4)
     model_optimizer = optim.Adam(model.parameters())
 
+    early_stopping = EarlyStopping(patience=10, verbose=True, path=os.path.join(base_output_path, 'best_model/'))
+
     for i in range(epoches):
         trainer.train_epoch('train', train_dataset, collate_fn, batch_size, i, model_optimizer)
+        loss_epoch = trainer.loss_epoch
+        early_stopping(loss_epoch, model, i) # 最良モデルならモデルパラメータ保存
+        if early_stopping.early_stop: 
+            break
         trainer.serialize(i, output_path=base_output_path)
 
 def infer(args):

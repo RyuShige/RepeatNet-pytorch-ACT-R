@@ -30,6 +30,7 @@ class CumulativeTrainer(object):
         self.num_gpus=num_gpus
         self.tokenizer=tokenizer
         self.detokenizer=detokenizer
+        self.loss_epoch=0
 
         if local_rank is not None:
             torch.cuda.set_device(local_rank)
@@ -87,6 +88,8 @@ class CumulativeTrainer(object):
 
     def train_epoch(self, method, train_dataset, train_collate_fn, batch_size, epoch, optimizer, scheduler=None):
         self.model.train()
+        losssum=0
+        self.loss_epoch=0
         if torch.cuda.is_available():
             sampler = DistributedSampler(train_dataset)
             sampler.set_epoch(epoch)
@@ -118,6 +121,9 @@ class CumulativeTrainer(object):
                     print('Method', method, 'Epoch', epoch, 'Batch ', count_batch, 'Loss ', bloss, 'Time ', elapsed_time)
 
                 sys.stdout.flush()
+            losssum+=bloss
+
+        self.loss_epoch = losssum/count_batch
 
         if self.accumulation_count % self.accumulation_steps != 0:
             optimizer.step()
