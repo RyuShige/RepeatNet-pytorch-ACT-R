@@ -100,6 +100,7 @@ class CumulativeTrainer(object):
         start_time = time.time()
         count_batch=0
         bloss=0
+        bloss_put=0
         for j, data in enumerate(train_loader, 0):
             if torch.cuda.is_available():
                 data_cuda = dict()
@@ -122,8 +123,8 @@ class CumulativeTrainer(object):
 
                 sys.stdout.flush()
             for i in bloss:
-                bloss = i
-            losssum+=bloss
+                bloss_put = i
+            losssum+=bloss_put
 
         self.loss_epoch = losssum/count_batch
 
