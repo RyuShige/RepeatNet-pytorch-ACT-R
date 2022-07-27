@@ -121,6 +121,8 @@ class CumulativeTrainer(object):
                     print('Method', method, 'Epoch', epoch, 'Batch ', count_batch, 'Loss ', bloss, 'Time ', elapsed_time)
 
                 sys.stdout.flush()
+            for i in bloss:
+                bloss = i
             losssum+=bloss
 
         self.loss_epoch = losssum/count_batch
