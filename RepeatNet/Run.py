@@ -1,3 +1,4 @@
+from asyncore import file_dispatcher
 import sys
 sys.path.append('./')
 from RepeatNet.Dataset import *
@@ -65,35 +66,43 @@ def infer(args):
     valid_dataset = RepeatNetDataset(base_data_path + 'demo.valid')
     test_dataset = RepeatNetDataset(base_data_path + 'demo.test')
 
+    exist_file = None
+    epoch = 0
+
     for i in range(epoches):
         print('epoch', i)
         file = base_output_path+'model/'+ str(i) + '.pkl'
 
-        result_output_path = os.path.join(base_output_path, 'result/')
-        if not os.path.exists(result_output_path):
-            os.makedirs(result_output_path)
-
         if os.path.exists(file):
-            model = RepeatNet(embedding_size, hidden_size, item_vocab_size)
-            model.load_state_dict(torch.load(file, map_location='cpu'))
-            trainer = CumulativeTrainer(model, None, None, args.local_rank, 4)
+            exist_file = file
+            epoch = i
+        else:
+            continue
 
-            rs = trainer.predict('infer', valid_dataset, collate_fn, batch_size, i, base_output_path)
-            file = codecs.open(base_output_path+'result/'+str(i)+'.'+str(args.local_rank)+'.valid', mode='w', encoding='utf-8')
-            for data, output in rs:
-                scores, index=output
-                label=data['item_tgt']
-                for j in range(label.size(0)):
-                    file.write('[' + ','.join([str(id) for id in index[j, :50].tolist()]) + ']|[' + ','.join([str(id) for id in label[j].tolist()]) + ']' + os.linesep)
-            file.close()
-            rs = trainer.predict('infer', test_dataset, collate_fn, batch_size, i, base_output_path)
-            file = codecs.open(base_output_path + 'result/' + str(i)+'.'+str(args.local_rank)+'.test', mode='w', encoding='utf-8')
-            for data, output in rs:
-                scores, index = output
-                label = data['item_tgt']
-                for j in range(label.size(0)):
-                    file.write('[' + ','.join([str(id) for id in index[j, :50].tolist()]) + ']|[' + ','.join([str(id) for id in label[j].tolist()]) + ']' + os.linesep)
-            file.close()
+    result_output_path = os.path.join(base_output_path, 'result/')
+    if not os.path.exists(result_output_path):
+        os.makedirs(result_output_path)
+
+    model = RepeatNet(embedding_size, hidden_size, item_vocab_size)
+    model.load_state_dict(torch.load(file, map_location='cpu'))
+    trainer = CumulativeTrainer(model, None, None, args.local_rank, 4)
+
+    rs = trainer.predict('infer', valid_dataset, collate_fn, batch_size, epoch, base_output_path)
+    file = codecs.open(base_output_path+'result/'+str(epoch)+'.'+str(args.local_rank)+'.valid', mode='w', encoding='utf-8')
+    for data, output in rs:
+        scores, index=output
+        label=data['item_tgt']
+        for i in range(label.size(0)):
+            file.write('[' + ','.join([str(id) for id in index[i, :50].tolist()]) + ']|[' + ','.join([str(id) for id in label[i].tolist()]) + ']' + os.linesep)
+    file.close()
+    rs = trainer.predict('infer', test_dataset, collate_fn, batch_size, epoch, base_output_path)
+    file = codecs.open(base_output_path + 'result/' + str(epoch)+'.'+str(args.local_rank)+'.test', mode='w', encoding='utf-8')
+    for data, output in rs:
+        scores, index = output
+        label = data['item_tgt']
+        for i in range(label.size(0)):
+            file.write('[' + ','.join([str(id) for id in index[i, :50].tolist()]) + ']|[' + ','.join([str(id) for id in label[i].tolist()]) + ']' + os.linesep)
+    file.close()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
