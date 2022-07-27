@@ -84,7 +84,7 @@ def infer(args):
         os.makedirs(result_output_path)
 
     model = RepeatNet(embedding_size, hidden_size, item_vocab_size)
-    model.load_state_dict(torch.load(file, map_location='cpu'))
+    model.load_state_dict(torch.load(exist_file, map_location='cpu'))
     trainer = CumulativeTrainer(model, None, None, args.local_rank, 4)
 
     rs = trainer.predict('infer', valid_dataset, collate_fn, batch_size, epoch, base_output_path)
