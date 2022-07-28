@@ -109,16 +109,21 @@ def infer(args):
         scores, index = output
         label = data['item_tgt']
         tp = 0
+        rank = 0
         all_pre = label.size(0)
 
         for i in range(label.size(0)):
-            label_id = 0
-            for id in label[i].tolist():
-                label_id = id
-            for id in index[i, :20].tolist():
-                if label_id == id:
+            correct_label_id = 0
+            k = 0
+            for c_id in label[i].tolist():
+                correct_label_id = c_id
+            for p_id in index[i, :20].tolist():
+                k+=1
+                if correct_label_id == p_id:
                     tp+=1
+                    rank+=1/k
     print('Recall@20 : ', tp/all_pre) 
+    print('MRR@20 : ', rank/all_pre) 
 
     
 
