@@ -103,21 +103,20 @@ def infer(args):
             file.write('[' + ','.join([str(id) for id in index[i, :50].tolist()]) + ']|[' + ','.join([str(id) for id in label[i].tolist()]) + ']' + os.linesep)
     file.close()
 
-    all_pre = 0
-    tp = 0
     print('rs : ', rs)
     print('rs_len : ', len(rs))
     for data, output in rs:
         scores, index = output
         label = data['item_tgt']
-        all_pre+=1
+        tp = 0
+        all_pre = label.size(0)
 
         for i in range(label.size(0)):
-            label = 0
+            label_id = 0
             for id in label[i].tolist():
-                label = id
+                label_id = id
             for id in index[i, :20].tolist():
-                if label == id:
+                if label_id == id:
                     tp+=1
     print('Recall@20 : ', tp/all_pre) 
 
