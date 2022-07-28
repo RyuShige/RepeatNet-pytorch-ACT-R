@@ -103,6 +103,25 @@ def infer(args):
             file.write('[' + ','.join([str(id) for id in index[i, :50].tolist()]) + ']|[' + ','.join([str(id) for id in label[i].tolist()]) + ']' + os.linesep)
     file.close()
 
+    all_pre = 0
+    tp = 0
+    print('rs : ', rs)
+    # for data, output in rs:
+    #     scores, index = output
+    #     label = data['item_tgt']
+    #     all_pre+=1
+
+    #     for i in range(label.size(0)):
+    #         label = 0
+    #         for id in label[i].tolist():
+    #             label = id
+    #         for id in index[i, :20].tolist():
+    #             if label == id:
+    #                 tp+=1
+    # print('Recall@20 : ', tp/all_pre) 
+
+    
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--local_rank", type=int)
