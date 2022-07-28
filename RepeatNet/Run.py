@@ -103,7 +103,6 @@ def infer(args):
             file.write('[' + ','.join([str(id) for id in index[i, :50].tolist()]) + ']|[' + ','.join([str(id) for id in label[i].tolist()]) + ']' + os.linesep)
     file.close()
 
-    print('rs : ', rs)
     print('rs_len : ', len(rs))
     for data, output in rs:
         scores, index = output
