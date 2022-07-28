@@ -106,19 +106,20 @@ def infer(args):
     all_pre = 0
     tp = 0
     print('rs : ', rs)
-    # for data, output in rs:
-    #     scores, index = output
-    #     label = data['item_tgt']
-    #     all_pre+=1
+    print('rs_len : ', len(rs))
+    for data, output in rs:
+        scores, index = output
+        label = data['item_tgt']
+        all_pre+=1
 
-    #     for i in range(label.size(0)):
-    #         label = 0
-    #         for id in label[i].tolist():
-    #             label = id
-    #         for id in index[i, :20].tolist():
-    #             if label == id:
-    #                 tp+=1
-    # print('Recall@20 : ', tp/all_pre) 
+        for i in range(label.size(0)):
+            label = 0
+            for id in label[i].tolist():
+                label = id
+            for id in index[i, :20].tolist():
+                if label == id:
+                    tp+=1
+    print('Recall@20 : ', tp/all_pre) 
 
     
 
